@@ -165,7 +165,7 @@ function connect() {
   c.on("connect", () => {
     ok = true; netUI();
     c.subscribe([base() + "/state", base() + "/img", base() + "/p/" + pid]);
-    lastHid = null; // (re)announce ourselves once the host's state arrives
+    lastHid = null; lastAnn = 0; // (re)announce ourselves once the host's state arrives
     render();
   });
   c.on("close", () => { ok = false; netUI(); });
@@ -186,7 +186,7 @@ function onReply(m) {
   else if (m.type === "nope") { err = m.err || "다시 시도해 주세요."; pendingCard = null; beep(220, .2, "square", .2); buzz([60, 40, 60]); }
   render();
 }
-let lastHid = null, typed = "";
+let lastHid = null, lastAnn = 0, typed = "";
 function announce() {
   const s = saved();
   if (s) { me = s; sendMsg(s.tablet ? { type: "join", tablet: true } : { type: "join", name: s.typed || s.name }); }
@@ -199,7 +199,7 @@ function onState(m) {
     const tried = store.get("fm-moved");
     if (tried !== m.pu) { store.set("fm-moved", m.pu); location.replace(m.pu.split(/[?#]/)[0] + location.search + location.hash); return; }
   }
-  if (m.hid !== lastHid) { lastHid = m.hid; announce(); } // host page opened or reloaded: tell it we are here
+  if (m.hid !== lastHid) { lastHid = m.hid; if (Date.now() - lastAnn > 3000) { lastAnn = Date.now(); announce(); } } // host page opened or reloaded: tell it we are here
   const prevView = st && st.view;
   st = m; netUI();
   const myTurn = isMyTurn();
