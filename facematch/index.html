@@ -157,9 +157,7 @@ function connect() {
   c.on("connect", () => {
     ok = true; netUI();
     c.subscribe([base() + "/state", base() + "/img", base() + "/p/" + pid]);
-    const s = saved();
-    if (s) { me = s; sendMsg(s.tablet ? { type: "join", tablet: true } : { type: "join", name: s.name }); }
-    else sendMsg({ type: "hello" });
+    lastHid = null; // (re)announce ourselves once the host's state arrives
     render();
   });
   c.on("close", () => { ok = false; netUI(); });
@@ -175,13 +173,20 @@ function netUI() { $("dot").classList.toggle("on", ok); $("net").textContent = o
 function sendMsg(obj) { if (client && ok) client.publish(base() + "/in", JSON.stringify({ ...obj, pid })); }
 function onReply(m) {
   joining = false;
-  if (m.type === "joined") { me = m.name ? { name: m.name, team: m.team } : { tablet: true }; store.set("fm-me-" + room, JSON.stringify(me)); err = ""; beep(880, .12); buzz(40); }
+  if (m.type === "joined") { me = m.name ? { name: m.name, team: m.team, typed: typed || (saved() || {}).typed || "" } : { tablet: true }; store.set("fm-me-" + room, JSON.stringify(me)); err = ""; beep(880, .12); buzz(40); }
   else if (m.type === "who") { me = null; store.set("fm-me-" + room, null); }
   else if (m.type === "nope") { err = m.err || "다시 시도해 주세요."; pendingCard = null; beep(220, .2, "square", .2); buzz([60, 40, 60]); }
   render();
 }
+let lastHid = null, typed = "";
+function announce() {
+  const s = saved();
+  if (s) { me = s; sendMsg(s.tablet ? { type: "join", tablet: true } : { type: "join", name: s.typed || s.name }); }
+  else sendMsg({ type: "hello" });
+}
 function onState(m) {
   if (!m || !m.v) { st = null; netUI(); return render(); }
+  if (m.hid !== lastHid) { lastHid = m.hid; announce(); } // host page opened or reloaded: tell it we are here
   const prevView = st && st.view;
   st = m; netUI();
   const myTurn = isMyTurn();
@@ -226,14 +231,14 @@ function renderJoin(v) {
   v.innerHTML = `<div class="card-box"><h1>이름을 입력하세요</h1><p>명단에 있는 이름 그대로 입력하면 조가 자동으로 정해져요.</p>
     <form class="join" id="joinForm" autocomplete="off"><input id="nameIn" maxlength="12" placeholder="홍길동" aria-label="이름"><button class="btn" type="submit" ${joining ? "disabled" : ""}>입장</button></form>
     <div class="err">${esc(err)}</div></div>`;
-  $("joinForm").onsubmit = e => { e.preventDefault(); const n = $("nameIn").value.trim(); if (!n) return; joining = true; err = ""; sendMsg({ type: "join", name: n }); beep(520, .06); setTimeout(() => { if (joining) { joining = false; err = "응답이 없어요. 진행자 화면이 켜져 있는지 확인해 주세요."; render(); } }, 6000); };
+  $("joinForm").onsubmit = e => { e.preventDefault(); const n = $("nameIn").value.trim(); if (!n) return; typed = n; joining = true; err = ""; sendMsg({ type: "join", name: n }); beep(520, .06); setTimeout(() => { if (joining) { joining = false; err = "응답이 없어요. 진행자 화면이 켜져 있는지 확인해 주세요."; render(); } }, 6000); };
 }
 function scoreList() {
   const rows = (st.teams || []).slice().sort((a, b) => b.score - a.score);
   return `<div class="list">${rows.map((t, i) => `<div class="row ${me && t.name === me.team ? "mine" : ""}"><span class="r">${i + 1}</span><span class="n">${esc(t.name)}</span><span class="s">${t.score}</span></div>`).join("")}</div>`;
 }
 function vLobby(v) {
-  v.innerHTML = `<div class="card-box"><h1>${me.tablet ? "입장 완료!" : `${esc(me.name)} 님, 입장 완료!`}</h1>
+  v.innerHTML = `<div class="card-box"><h1>${me.tablet ? "입장 완료!" : `${esc(me.name)}${me.name.endsWith("님") ? "" : " 님"}, 입장 완료!`}</h1>
     <p>${me.tablet ? "진행자가 조를 고르면 시작해요." : `<b>${esc(me.team)}</b>예요. 우리 조 차례가 오면 이 화면에서 카드를 고릅니다.`}</p></div>
     <div class="card-box"><h2>${st.round}라운드 점수</h2>${scoreList()}</div>`;
 }
