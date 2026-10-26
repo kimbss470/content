@@ -55,15 +55,24 @@ form.join { display: grid; gap: 10px; width: 100%; }
 .order span.me2 { background: var(--sun); box-shadow: 0 2px 0 var(--ink); }
 .order span.on { background: var(--mint); }
 .pad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: var(--table-deep); border: 3px solid var(--ink); border-radius: 20px; padding: 12px; box-shadow: 0 5px 0 var(--ink); }
-.pc { aspect-ratio: 1; border: 3px solid var(--ink); border-radius: 14px; background: var(--coral); box-shadow: 0 4px 0 var(--ink); display: grid; place-items: center; padding: 2px;
-  background-image: radial-gradient(rgba(255,255,255,.22) 3px, transparent 3.5px); background-size: 16px 16px; }
+.pc { position: relative; aspect-ratio: 1; border: 0; padding: 0; background: none; perspective: 600px; }
+.pc .in { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .55s cubic-bezier(.4,1.5,.5,1) var(--d, 0ms); }
+.pc.up .in, .pc.done .in { transform: rotateY(180deg); }
+.pc .f { position: absolute; inset: 0; border: 3px solid var(--ink); border-radius: 14px; box-shadow: 0 4px 0 var(--ink); backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; display: grid; place-items: center; }
+.pc .bk { background: var(--coral); background-image: radial-gradient(rgba(255,255,255,.22) 3px, transparent 3.5px); background-size: 16px 16px; }
+.pc .fr { transform: rotateY(180deg); background: var(--paper); padding: 2px; }
+.pc .fr img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .pc b { font-family: var(--f-num); font-size: clamp(20px, 7vw, 34px); color: var(--sun); -webkit-text-stroke: 1.5px var(--ink); }
-.pc.up { background: var(--paper); background-image: none; }
-.pc.done { background: #c9f4df; background-image: none; border-color: #12945c; box-shadow: 0 4px 0 #12945c; }
-.pc .nm { font-family: var(--f-display); font-size: clamp(14px, 4.4vw, 21px); line-height: 1.1; word-break: keep-all; }
-.pc.pending { outline: 4px solid var(--sun); outline-offset: 1px; }
-.pc:disabled:not(.up):not(.done) { filter: saturate(.55) brightness(.92); }
-.pc:active:not(:disabled) { transform: translateY(4px); box-shadow: none; }
+.pc .nm { position: relative; font-family: var(--f-display); font-size: clamp(14px, 4.4vw, 21px); line-height: 1.1; word-break: keep-all; text-align: center; }
+.pc .fr.ph { place-items: end stretch; padding: 0; }
+.pc .fr.ph .nm { font-size: clamp(11px, 3.2vw, 15px); background: rgba(255,255,255,.92); border-top: 2px solid var(--ink); padding: 1px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc.done .fr { border-color: #12945c; box-shadow: 0 4px 0 #12945c; }
+.pc.done .fr::after { content: "✓"; position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: var(--mint); border: 2px solid var(--ink); display: grid; place-items: center; font-weight: 700; font-size: 13px; }
+.pc.flipping { animation: lift .55s ease-out var(--d, 0ms); z-index: 2; }
+@keyframes lift { 45% { transform: translateY(-8%) scale(1.15); filter: drop-shadow(0 12px 8px rgba(21,25,58,.35)); } }
+.pc.pending .bk { outline: 4px solid var(--sun); outline-offset: -8px; }
+.pc:disabled:not(.up):not(.done) .bk { filter: saturate(.55) brightness(.92); }
+.pc:active:not(:disabled) .in { translate: 0 4px; }
 .pc.gone { visibility: hidden; }
 .stats { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
 .stats span { background: var(--paper); border: 2px solid var(--ink); border-radius: 10px; padding: 3px 10px; font-weight: 700; font-size: 14px; }
@@ -75,7 +84,7 @@ form.join { display: grid; gap: 10px; width: 100%; }
 .row .s { font-family: var(--f-num); font-size: 17px; }
 .small { font-size: 13px; color: rgba(255,255,255,.9); text-align: center; }
 .small button { background: none; border: 0; color: #fff; text-decoration: underline; font-size: 13px; }
-@media (prefers-reduced-motion: reduce) { .btn, .pc { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .pc .in { transition-duration: .25s; } .pc.flipping { animation: none; } }
 </style>
 </head>
 <body>
@@ -102,10 +111,25 @@ const qs = new URLSearchParams(location.search);
 let room = (qs.get("r") || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
 let brokerIdx = Math.min(BROKERS.length - 1, Math.max(0, parseInt(qs.get("b") || "0", 10) || 0));
 const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} } };
+const hk = new URLSearchParams(location.hash.slice(1)).get("k");
+if (hk && room) store.set("fm-key-" + room, hk);
 let pid = store.get("fm-pid"); if (!pid) { pid = "p" + Math.random().toString(36).slice(2, 12); store.set("fm-pid", pid); }
 function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
 const fmt = ms => (ms / 1000).toFixed(1);
 
+let photos = { id: null, map: {} };
+async function onPhotos(m) {
+  if (!m || !m.ct) { photos = { id: null, map: {} }; return; }
+  const k = store.get("fm-key-" + room);
+  if (!k || !(window.crypto && crypto.subtle)) return;
+  try {
+    const d = x => Uint8Array.from(atob(x.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+    const key = await crypto.subtle.importKey("raw", d(k), "AES-GCM", false, ["decrypt"]);
+    const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: d(m.iv) }, key, d(m.ct));
+    photos = { id: m.id, map: JSON.parse(new TextDecoder().decode(pt)) };
+    render();
+  } catch {}
+}
 let client = null, ok = false, st = null, me = null /* {name, team} or {tablet:true} */, err = "", pendingCard = null, lastWho = null, joining = false;
 const saved = () => { try { return JSON.parse(store.get("fm-me-" + room) || "null"); } catch { return null; } };
 
@@ -126,7 +150,7 @@ function connect() {
   const c = client = mqtt.connect(BROKERS[brokerIdx], { clientId: "fmp_" + pid + "_" + Math.random().toString(16).slice(2, 6), clean: true, connectTimeout: 6000, reconnectPeriod: 2000, keepalive: 30 });
   c.on("connect", () => {
     ok = true; netUI();
-    c.subscribe([base() + "/state", base() + "/p/" + pid]);
+    c.subscribe([base() + "/state", base() + "/img", base() + "/p/" + pid]);
     const s = saved();
     if (s) { me = s; sendMsg(s.tablet ? { type: "join", tablet: true } : { type: "join", name: s.name }); }
     else sendMsg({ type: "hello" });
@@ -134,7 +158,9 @@ function connect() {
   });
   c.on("close", () => { ok = false; netUI(); });
   c.on("message", (topic, payload) => {
-    let m; try { m = JSON.parse(payload.toString()); } catch { return; }
+    let m; try { m = payload.length ? JSON.parse(payload.toString()) : null; } catch { return; }
+    if (topic.endsWith("/img")) { onPhotos(m); return; }
+    if (!m) { if (topic.endsWith("/state")) onState(null); return; }
     if (topic.endsWith("/state")) { onState(m); return; }
     onReply(m);
   });
@@ -167,6 +193,8 @@ function isMyTurn() {
 /* ---------- views ---------- */
 function render() {
   const v = $("view");
+  const isPad = st && me && ok && (st.view === "peek" || st.view === "play");
+  if (!isPad) v.dataset.v = "";
   $("me").hidden = !me; $("me").textContent = me ? (me.tablet ? "공용 태블릿" : `${me.name} · ${me.team || ""}`) : "";
   $("btnLeave").hidden = !me;
   if (!room) {
@@ -179,7 +207,7 @@ function render() {
   if (!st) { v.innerHTML = `<div class="card-box"><h2>진행자 화면을 찾는 중…</h2><p>TV의 진행자 화면이 켜져 있는지, 방 코드 <b>${esc(room)}</b>가 맞는지 확인해 주세요.</p></div>`; return; }
   if (!me) return renderJoin(v);
   const fn = { lobby: vLobby, ready: vReady, count: vCount, peek: vPlay, play: vPlay, done: vDone, results: vResults }[st.view] || vLobby;
-  if (st.alarm) return vAlarm(v);
+  if (st.alarm && st.view !== "play") return vAlarm(v);
   fn(v);
 }
 function renderJoin(v) {
@@ -216,25 +244,52 @@ function vReady(v) {
 function vCount(v) { v.innerHTML = `<div class="card-box turn"><h1>곧 시작!</h1><p>TV를 보세요. 카드가 잠깐 공개됩니다.</p></div>`; }
 function vPlay(v) {
   const peek = st.view === "peek", my = isMyTurn(), mine = me.tablet || st.team === me.team;
-  const head = peek
-    ? `<div class="card-box turn"><h1>외워 두세요!</h1><p>TV에 사진이 공개돼 있어요. 곧 모두 뒤집힙니다.</p></div>`
+  const head = st.alarm
+    ? `<div class="card-box alarm"><h1>${esc(st.alarm)} 본인 등장! 😱</h1><p>맞춘 카드가 모두 뒤집혀요. 첫 사람부터 다시!</p></div>`
+    : peek
+    ? `<div class="card-box turn"><h1>외워 두세요!</h1><p>곧 모두 뒤집힙니다.</p></div>`
     : my ? `<div class="card-box turn"><h1>${me.tablet ? `${esc(st.who || "")} 차례!` : "내 차례!"}</h1><p>카드 두 장을 고르세요.${me.tablet ? "" : " <b>내 얼굴</b>을 고르면 처음부터 다시예요!"}</p></div>`
     : `<div class="card-box"><h2>지금 차례: ${esc(st.who || "-")}</h2><p>${mine ? "앞사람이 맞추면 다음 사람 차례예요." : `${esc(st.team)} 진행 중`}</p></div>`;
   const cards = st.cards || [];
-  const pad = `<div class="pad">${Array.from({ length: 16 }, (_, i) => {
-    const c = cards[i];
-    if (!c) return `<button class="pc gone" type="button" disabled></button>`;
-    const cls = c[0] === 2 ? "done" : c[0] === 1 ? "up" : "";
-    const can = my && !peek && !st.lock && c[0] === 0 && pendingCard == null;
-    return `<button class="pc ${cls} ${pendingCard === i ? "pending" : ""}" data-i="${i}" type="button" ${can ? "" : "disabled"} aria-label="카드 ${i + 1}">${c[0] ? `<span class="nm">${esc(c[1])}</span>` : `<b>${i + 1}</b>`}</button>`;
-  }).join("")}</div>`;
-  v.innerHTML = head + pad + `<div class="stats"><span>${esc(st.team || "")}</span><span>맞춘 쌍 ${st.pairs}/8</span><span>리셋 ${st.resets}</span></div><div class="err" style="text-align:center;color:#fff">${esc(err)}</div>`;
-  v.querySelectorAll(".pc[data-i]").forEach(b => b.onclick = () => {
-    if (b.disabled) return;
-    const i = +b.dataset.i; pendingCard = i; err = "";
-    sendMsg({ type: "flip", i }); beep(700, .05, "square", .15); buzz(20); render();
-    setTimeout(() => { if (pendingCard === i) { pendingCard = null; render(); } }, 2500);
+  const pic = photos.id && photos.id === st.deck ? photos.map : {};
+  // the pad stays in the DOM between updates so the cards can turn over instead of popping
+  if (v.dataset.v !== "pad" || v.dataset.deck !== String(st.deck)) {
+    v.dataset.v = "pad"; v.dataset.deck = String(st.deck);
+    v.innerHTML = `<div id="head"></div><div class="pad" id="pad"></div><div class="stats" id="stats"></div><div class="err" id="perr" style="text-align:center;color:#fff"></div>`;
+    $("pad").innerHTML = Array.from({ length: 16 }, (_, i) => `<button class="pc" data-i="${i}" type="button" aria-label="카드 ${i + 1}"><div class="in"><div class="f bk"><b>${i + 1}</b></div><div class="f fr"></div></div></button>`).join("");
+    $("pad").querySelectorAll(".pc").forEach(b => b.onclick = () => {
+      if (b.disabled) return;
+      const i = +b.dataset.i; pendingCard = i; err = "";
+      sendMsg({ type: "flip", i }); beep(700, .05, "square", .15); buzz(20); render();
+      setTimeout(() => { if (pendingCard === i) { pendingCard = null; render(); } }, 2500);
+    });
+  }
+  $("head").innerHTML = head;
+  const wave = st.view === "play" && cards.filter(c => c && c[0]).length === 0 && v._upN > 1; // reset: everything flips back in a wave
+  let k = 0;
+  $("pad").querySelectorAll(".pc").forEach(b => {
+    const i = +b.dataset.i, c = cards[i];
+    b.classList.toggle("gone", !c);
+    if (!c) { b.disabled = true; return; }
+    const was = b.classList.contains("up") || b.classList.contains("done"), now = c[0] > 0;
+    if (now) {
+      const fr = b.querySelector(".fr"), src = pic[c[1]] || "";
+      if (fr.dataset.nm !== c[1] || fr.dataset.src !== src) {
+        fr.dataset.nm = c[1]; fr.dataset.src = src; fr.classList.toggle("ph", !!src);
+        fr.innerHTML = (src ? `<img src="${src}" alt="">` : "") + `<span class="nm">${esc(c[1])}</span>`;
+      }
+    }
+    if (was !== now) {
+      b.style.setProperty("--d", wave && was ? (k++ * 70) + "ms" : "0ms");
+      b.classList.remove("flipping"); void b.offsetWidth; b.classList.add("flipping");
+    }
+    b.classList.toggle("up", c[0] === 1); b.classList.toggle("done", c[0] === 2);
+    b.classList.toggle("pending", pendingCard === i);
+    b.disabled = !(my && !peek && !st.lock && c[0] === 0 && pendingCard == null);
   });
+  v._upN = cards.filter(c => c && c[0]).length;
+  $("stats").innerHTML = `<span>${esc(st.team || "")}</span><span>맞춘 쌍 ${st.pairs}/8</span><span>리셋 ${st.resets}</span>`;
+  $("perr").textContent = err;
 }
 function vAlarm(v) { v.innerHTML = `<div class="card-box alarm"><h1>${esc(st.alarm)}<br>본인 등장! 😱</h1><p>맞춘 카드가 모두 뒤집혀요. 첫 사람부터 다시!</p></div>`; }
 function vDone(v) {
