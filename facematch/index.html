@@ -186,6 +186,11 @@ function announce() {
 }
 function onState(m) {
   if (!m || !m.v) { st = null; netUI(); return render(); }
+  if (m.pu && /^https:\/\//.test(m.pu) && m.pu.split(/[?#]/)[0] !== location.origin + location.pathname) {
+    // the host links to a newer player page: move there, keeping room, server and photo key
+    const tried = store.get("fm-moved");
+    if (tried !== m.pu) { store.set("fm-moved", m.pu); location.replace(m.pu.split(/[?#]/)[0] + location.search + location.hash); return; }
+  }
   if (m.hid !== lastHid) { lastHid = m.hid; announce(); } // host page opened or reloaded: tell it we are here
   const prevView = st && st.view;
   st = m; netUI();
