@@ -74,7 +74,7 @@ form.join { display: grid; gap: 10px; width: 100%; }
 .pc:disabled:not(.up):not(.done) .bk { filter: saturate(.55) brightness(.92); }
 .pc:active:not(:disabled) .in { translate: 0 4px; }
 .pc.gone { visibility: hidden; }
-.pc .fr img.skull { position: absolute; inset: auto; left: 38%; top: 3%; width: 42%; height: auto; object-fit: contain; z-index: 3; pointer-events: none; filter: drop-shadow(0 3px 0 rgba(21,25,58,.45)); animation: stamp .5s .42s cubic-bezier(.2,1.5,.4,1) both; }
+.pc .fr img.skull { position: absolute; inset: auto; left: 58%; top: 3%; width: 42%; height: auto; object-fit: contain; z-index: 3; pointer-events: none; filter: drop-shadow(0 3px 0 rgba(21,25,58,.45)); animation: stamp .5s .42s cubic-bezier(.2,1.5,.4,1) both; }
 @keyframes stamp { 0% { transform: scale(3.4) rotate(-35deg); opacity: 0; } 55% { transform: scale(.82) rotate(-6deg); opacity: 1; } 75% { transform: scale(1.06) rotate(-11deg); } 100% { transform: scale(1) rotate(-9deg); } }
 .pc.self .fr { border-color: var(--coral); box-shadow: 0 0 0 4px var(--coral), 0 4px 0 var(--ink); }
 .pc.self .in { animation: shake .45s .42s 2; }
@@ -251,10 +251,10 @@ function vCount(v) { v.innerHTML = `<div class="card-box turn"><h1>곧 시작!</
 function vPlay(v) {
   const peek = st.view === "peek", my = isMyTurn(), mine = me.tablet || st.team === me.team;
   const head = st.alarm
-    ? `<div class="card-box alarm"><h1>${esc(st.alarm)} 본인 등장! 💀</h1><p>맞춘 카드가 모두 뒤집혀요. 첫 사람부터 다시!</p></div>`
+    ? `<div class="card-box alarm"><h1>${esc(st.alarm)} 본인 등장! 💀</h1><p>맞춘 카드가 모두 뒤집혀요. 본인부터 다시!</p></div>`
     : peek
     ? `<div class="card-box turn"><h1>외워 두세요!</h1><p>곧 모두 뒤집힙니다.</p></div>`
-    : my ? `<div class="card-box turn"><h1>${me.tablet ? `${esc(st.who || "")} 차례!` : "내 차례!"}</h1><p>카드 두 장을 고르세요. <b>${me.tablet ? `${esc(st.who || "")} 본인 얼굴` : "내 얼굴"}</b>을 고르면 처음부터 다시예요!</p></div>`
+    : my ? `<div class="card-box turn"><h1>${me.tablet ? `${esc(st.who || "")} 차례!` : "내 차례!"}</h1><p>카드 두 장을 고르세요. <b>${me.tablet ? `${esc(st.who || "")} 본인 얼굴` : "내 얼굴"}</b>을 고르면 카드가 전부 덮이고 다시 시작이에요!</p></div>`
     : `<div class="card-box"><h2>지금 차례: ${esc(st.who || "-")}</h2><p>${mine ? "앞사람이 맞추면 다음 사람 차례예요." : `${esc(st.team)} 진행 중`}</p></div>`;
   const cards = st.cards || [];
   const pic = photos.id && photos.id === st.deck ? photos.map : {};
@@ -301,7 +301,7 @@ function vPlay(v) {
   $("stats").innerHTML = `<span>${esc(st.team || "")}</span><span>맞춘 쌍 ${st.pairs}/8</span><span>리셋 ${st.resets}</span>`;
   $("perr").textContent = err;
 }
-function vAlarm(v) { v.innerHTML = `<div class="card-box alarm"><h1>${esc(st.alarm)}<br>본인 등장! 😱</h1><p>맞춘 카드가 모두 뒤집혀요. 첫 사람부터 다시!</p></div>`; }
+function vAlarm(v) { v.innerHTML = `<div class="card-box alarm"><h1>${esc(st.alarm)}<br>본인 등장! 😱</h1><p>맞춘 카드가 모두 뒤집혀요. 본인부터 다시!</p></div>`; }
 function vDone(v) {
   const t = (st.teams || []).find(x => x.name === st.team);
   v.innerHTML = `<div class="card-box turn"><h1>${esc(st.team)} 완료!</h1>${t && t.time != null ? `<div class="big">${fmt(t.time)}<span style="font-size:.4em">초</span></div>` : ""}<p>TV에서 다음 조를 기다려요.</p></div>`;
