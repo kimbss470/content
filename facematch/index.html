@@ -133,16 +133,19 @@ let pid = store.get("fm-pid"); if (!pid) { pid = "p" + Math.random().toString(36
 function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
 const fmt = ms => (ms / 1000).toFixed(1);
 
-let photos = { id: null, map: {} };
+let photos = { id: null, map: {}, deck: null };
+const opt = new Map(); // cards turned over locally, waiting for the host to confirm
 async function onPhotos(m) {
-  if (!m || !m.ct) { photos = { id: null, map: {} }; return; }
+  if (!m || !m.ct) { photos = { id: null, map: {}, deck: null }; return; }
   const k = store.get("fm-key-" + room);
   if (!k || !(window.crypto && crypto.subtle)) return;
   try {
     const d = x => Uint8Array.from(atob(x.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
     const key = await crypto.subtle.importKey("raw", d(k), "AES-GCM", false, ["decrypt"]);
     const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: d(m.iv) }, key, d(m.ct));
-    photos = { id: m.id, map: JSON.parse(new TextDecoder().decode(pt)) };
+    const map = JSON.parse(new TextDecoder().decode(pt)), deck = Array.isArray(map["\u0000deck"]) ? map["\u0000deck"] : null;
+    delete map["\u0000deck"];
+    photos = { id: m.id, map, deck };
     render();
   } catch {}
 }
@@ -185,7 +188,7 @@ function onReply(m) {
   joining = false;
   if (m.type === "joined") { me = m.name ? { name: m.name, team: m.team, typed: typed || (saved() || {}).typed || "" } : { tablet: true }; store.set("fm-me-" + room, JSON.stringify(me)); err = ""; beep(880, .12); buzz(40); }
   else if (m.type === "who") { me = null; store.set("fm-me-" + room, null); }
-  else if (m.type === "nope") { err = m.err || "다시 시도해 주세요."; pendingCard = null; beep(220, .2, "square", .2); buzz([60, 40, 60]); }
+  else if (m.type === "nope") { err = m.err || "다시 시도해 주세요."; pendingCard = null; opt.clear(); beep(220, .2, "square", .2); buzz([60, 40, 60]); }
   render();
 }
 let lastHid = null, lastAnn = 0, typed = "";
@@ -205,7 +208,7 @@ function onState(m) {
   const prevView = st && st.view;
   st = m; netUI();
   const myTurn = isMyTurn();
-  if (st.who !== lastWho) { pendingCard = null; if (myTurn) { beep(660, .1); setTimeout(() => beep(990, .16), 110); buzz([80, 60, 80]); } lastWho = st.who; }
+  if (st.who !== lastWho) { pendingCard = null; opt.clear(); if (myTurn) { beep(660, .1); setTimeout(() => beep(990, .16), 110); buzz([80, 60, 80]); } lastWho = st.who; }
   if (st.alarm && prevView !== "alarm") buzz(400);
   const storm = $("storm");
   if (st.ak === "prof" && !storm && SKULL) {
@@ -219,6 +222,7 @@ function onState(m) {
     document.body.appendChild(d);
   } else if (st.ak !== "prof" && storm) storm.remove();
   if (pendingCard != null && st.cards[pendingCard] && st.cards[pendingCard][0]) pendingCard = null;
+  for (const i of [...opt.keys()]) if (!st.cards || st.view !== "play" || st.lock || (st.cards[i] && st.cards[i][0])) opt.delete(i);
   render();
 }
 function isMyTurn() {
@@ -289,7 +293,8 @@ function vPlay(v) {
     ? `<div class="card-box turn"><h1>외워 두세요!</h1><p>곧 모두 뒤집힙니다.</p></div>`
     : my ? `<div class="card-box turn"><h1>${me.tablet ? `${esc(st.who || "")} 차례!` : "내 차례!"}</h1><p>카드 두 장을 고르세요. <b>${me.tablet ? `${esc(st.who || "")} 본인 얼굴` : "내 얼굴"}</b>을 고르면 맞춘 카드가 전부 덮이고 <b>${me.tablet ? esc(st.who || "") : "나"}</b>부터 다시 시작!</p></div>`
     : `<div class="card-box"><h2>지금 차례: ${esc(st.who || "-")}</h2><p>${mine ? "앞사람이 맞추면 다음 사람 차례예요." : `${esc(st.team)} 진행 중`}</p></div>`;
-  const cards = st.cards || [];
+  const cards = (st.cards || []).map((c, i) => c && !c[0] && opt.has(i) ? [1, opt.get(i)] : c);
+  const upN = cards.filter(c => c && c[0] === 1).length;
   const pic = photos.id && photos.id === st.deck ? photos.map : {};
   // the pad stays in the DOM between updates so the cards can turn over instead of popping
   if (v.dataset.v !== "pad" || v.dataset.deck !== String(st.deck)) {
@@ -298,9 +303,11 @@ function vPlay(v) {
     $("pad").innerHTML = Array.from({ length: 16 }, (_, i) => `<button class="pc" data-i="${i}" type="button" aria-label="카드 ${i + 1}"><div class="in"><div class="f bk"><b>${i + 1}</b></div><div class="f fr"></div></div></button>`).join("");
     $("pad").querySelectorAll(".pc").forEach(b => b.onclick = () => {
       if (b.disabled) return;
-      const i = +b.dataset.i; pendingCard = i; err = "";
+      const i = +b.dataset.i; err = "";
+      const deck = photos.deck && photos.id === st.deck ? photos.deck : null;
+      if (deck && deck[i]) { opt.set(i, deck[i]); setTimeout(() => { if (opt.delete(i)) render(); }, 2500); }
+      else { pendingCard = i; setTimeout(() => { if (pendingCard === i) { pendingCard = null; render(); } }, 2500); }
       sendMsg({ type: "flip", i }); beep(700, .05, "square", .15); buzz(20); render();
-      setTimeout(() => { if (pendingCard === i) { pendingCard = null; render(); } }, 2500);
     });
   }
   $("head").innerHTML = head;
@@ -332,7 +339,7 @@ function vPlay(v) {
     if (pk && !oa && ANGER) b.querySelector(".fr").insertAdjacentHTML("beforeend", `<img class="anger" src="${ANGER}" alt="빠직">`);
     if (!pk && oa) oa.remove();
     b.classList.toggle("pending", pendingCard === i);
-    b.disabled = !(my && !peek && !st.lock && c[0] === 0 && pendingCard == null);
+    b.disabled = !(my && !peek && !st.lock && c[0] === 0 && pendingCard == null && upN < 2);
   });
   v._upN = cards.filter(c => c && c[0]).length;
   $("stats").innerHTML = `<span>${esc(st.team || "")}</span><span>맞춘 쌍 ${st.pairs}/8</span><span>리셋 ${st.resets}</span>`;
