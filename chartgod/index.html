@@ -593,13 +593,14 @@ function drawHTML() {
     <div class="chartwrap"><canvas id="cv" style="height:${L.view.h}px"></canvas><div class="cv-tip" id="cvTip">${done ? (mine.sub ? "✔ 제출 완료" : "") : "오른쪽 빈칸에 이어 그리세요"}</div></div>
     <div class="tools">
       <div class="seg"><button type="button" data-mode="draw" class="${L.mode === "draw" ? "on" : ""}">✏️ 그리기</button><button type="button" data-mode="pan" class="${L.mode === "pan" ? "on" : ""}">✋ 이동</button></div>
-      <button type="button" class="mini" id="vAll">전체</button><button type="button" class="mini" id="vZone">그리기 구간</button><button type="button" class="mini" id="vReset">초기화</button>
+      <button type="button" class="mini" id="vZone">🔍 ${L.view.xz > 1 ? "전체 보기" : "구간 확대"}</button>
     </div>
     <details class="view-adv"><summary>보기 조절</summary>
       <label>가로 확대 <input type="range" id="vx" min="1" max="4" step="0.1" value="${L.view.xz}"></label>
       <label>가격 범위 <input type="range" id="vy" min="0.5" max="2.5" step="0.05" value="${L.view.yz}"></label>
       <label>가격 위치 <input type="range" id="vs" min="-0.8" max="0.8" step="0.02" value="${L.view.ys}"></label>
       <label>차트 높이 <input type="range" id="vh" min="220" max="520" step="10" value="${L.view.h}"></label>
+      <button type="button" class="mini" id="vReset">보기 초기화</button>
     </details>
     <div class="acts"><button type="button" class="btn ghost" id="clear" ${done ? "disabled" : ""}>다시 그리기</button><button type="button" class="btn go" id="submit" ${done ? "disabled" : ""}>${mine.sub ? "제출 완료" : "제출하기"}</button></div>
     <p class="save" id="saveSt"></p>`;
@@ -622,7 +623,7 @@ function escapeHTML() {
   return `${lockedNote()}<div class="esc-top"><div><small>현재가</small><b id="ePx">-</b></div><div><small>시작가 대비</small><b id="eRet">-</b></div></div>
     <div class="chartwrap"><canvas id="cv" style="height:260px"></canvas></div>
     ${sold ? `<div class="sold"><small>매도 완료</small><b>${fmtPx(sold.price, st.q.cur)}</b><span class="${sold.ret >= 0 ? "up" : "dn"}">${sold.ret >= 0 ? "+" : ""}${sold.ret.toFixed(2)}%</span><p>순위는 정답 공개 때 발표돼요</p></div>`
-      : `<button type="button" class="sell" id="sell" ${live() ? "" : "disabled"}>지금 매도!</button><p class="sub">한 번만 누를 수 있어요 · 서버가 접수한 순간의 가격으로 순위를 정해요</p>`}`;
+      : `<button type="button" class="sell" id="sell" ${live() ? "" : "disabled"}>지금 매도!</button><p class="sub">한 번만 누를 수 있어요</p>`}`;
 }
 function revealHTML() {
   const rv = st.rv, t = me(), o = rv.teams[t.slot], g = st.game;
@@ -709,8 +710,7 @@ function wireDraw(cv) {
   const q = st.q;
   document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { L.mode = b.dataset.mode; document.querySelectorAll("[data-mode]").forEach(x => x.classList.toggle("on", x === b)); cv.style.touchAction = L.mode === "draw" ? "none" : "none"; });
   const V = L.view;
-  $("vAll").onclick = () => { V.xz = 1; V.xc = null; syncSliders(); softRender(); };
-  $("vZone").onclick = () => { V.xz = 2.2; V.xc = q.split - 1 + (q.n - q.split) / 2; syncSliders(); softRender(); };
+  $("vZone").onclick = e => { if (V.xz > 1) { V.xz = 1; V.xc = null; } else { V.xz = 2.2; V.xc = q.split - 1 + (q.n - q.split) / 2; } e.currentTarget.textContent = "🔍 " + (V.xz > 1 ? "전체 보기" : "구간 확대"); syncSliders(); softRender(); };
   $("vReset").onclick = () => { L.view = { xz: 1, xc: null, yz: 1, ys: 0, h: 320 }; L.base = null; render(); };
   $("vx").oninput = e => { V.xz = +e.target.value; softRender(); };
   $("vy").oninput = e => { V.yz = +e.target.value; softRender(); };
