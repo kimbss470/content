@@ -88,10 +88,10 @@ button:disabled { opacity: .45; cursor: default; }
 .opt { display: grid; grid-template-columns: 44px 1fr; align-items: stretch; padding: 0; overflow: hidden; text-align: left; }
 .opt b { display: grid; place-items: center; font-size: 26px; }
 .opt canvas { width: 100%; height: 110px; display: block; }
-.esc-top { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.esc-top > div { padding: 10px 14px; display: grid; }
+.esc-top { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 10px; }
+.esc-top > div { padding: 10px 14px; display: grid; align-content: center; height: 86px; box-sizing: border-box; overflow: hidden; min-width: 0; }
 .esc-top small { font-size: 12px; }
-.esc-top b { font-size: 26px; font-variant-numeric: tabular-nums; }
+.esc-top b { display: block; font-size: 26px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; line-height: 1.1; }
 .up { color: var(--up); } .dn { color: var(--down); }
 .sell { width: 100%; padding: 26px 10px; font-size: 38px; font-weight: 700; }
 .sub { text-align: center; font-size: 13px; margin: 0; }
@@ -921,9 +921,17 @@ function paintEscape(cv, q, font) {
   drawChart(cv, { n, dates: q.dates, cur: q.cur, font, padR: 60, padL: 4, lo: L.smooth.lo, hi: L.smooth.hi, line, lineColor: col, lineW: 2.5, glow: document.body.dataset.theme === "trade" ? 8 : 0,
     lines: [{ pts: [[0, entry], [n - 1, entry]], color: cssVar("--axis"), w: 1, dash: [4, 6], alpha: .6 }], marks, dateGap: 60 });
   const ret = (px / entry - 1) * 100, e1 = $("ePx"), e2 = $("eRet");
-  if (e1) { e1.textContent = fmtPx(roundPx(px, q.cur), q.cur); e1.className = up ? "up" : "dn"; }
-  if (e2) { e2.textContent = (ret >= 0 ? "+" : "") + ret.toFixed(2) + "%"; e2.className = up ? "up" : "dn"; }
+  if (e1) { e1.textContent = fmtPx(roundPx(px, q.cur), q.cur); e1.className = up ? "up" : "dn"; fitText(e1); }
+  if (e2) { e2.textContent = (ret >= 0 ? "+" : "") + ret.toFixed(2) + "%"; e2.className = up ? "up" : "dn"; fitText(e2); }
   if (st.status === "drawing") { escFlash(cl, q); softRender(); }
+}
+/* price boxes keep one size: the text only ever shrinks within a round, so the screen never jumps while prices tick */
+function fitText(el) {
+  if (!L.fit || L.fit.round !== st.round) L.fit = { round: st.round };
+  if (L.fit[el.id]) el.style.fontSize = L.fit[el.id] + "px";
+  let fs = parseFloat(getComputedStyle(el).fontSize);
+  while (el.scrollWidth > el.clientWidth + 1 && fs > 12) { fs -= 1; el.style.fontSize = fs + "px"; }
+  L.fit[el.id] = fs;
 }
 /* new high / low since the replay started (same rule as the TV) */
 function escFlash(cl, q) {
