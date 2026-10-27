@@ -530,12 +530,17 @@ const MEMES = (() => {
   const man = (x, y, h = 64) => { const u = h / 64; // feet at (x, y)
     return `<g stroke="#333" stroke-width="${4 * u}" stroke-linecap="round" fill="none"><circle cx="${x}" cy="${y - 56 * u}" r="${8 * u}" fill="#fff"/><path d="M${x} ${y - 48 * u}V${y - 20 * u}M${x} ${y - 20 * u}L${x - 9 * u} ${y}M${x} ${y - 20 * u}L${x + 9 * u} ${y}M${x} ${y - 40 * u}L${x - 13 * u} ${y - 28 * u}M${x} ${y - 40 * u}L${x + 13 * u} ${y - 52 * u}"/></g>`; };
   return [
-    { svg: () => svg([[84, "머리"], [104, "어깨"], [210, "무릎"], [250, "발바닥"]].map(([y, s]) => `<path d="M14 ${y}H298" stroke="#b9b9b4" stroke-width="1.5" stroke-dasharray="4 5"/>` + txt(302, y + 5, s, 13, "#888", "start")).join("")
-        + jag([[18, 238], [55, 250], [80, 232], [102, 210], [135, 150], [165, 104], [190, 80], [210, 92], [228, 104], [255, 150], [275, 190], [296, 208]], 6, 17)
-        + `<g stroke="#333" stroke-width="4" stroke-linecap="round" fill="none"><circle cx="370" cy="84" r="11" fill="#fff"/><path d="M370 95V170M354 104H386M354 104L348 152M386 104L392 152M370 170L362 210L358 250M370 170L378 210L382 250"/></g>`
-        + `<circle cx="362" cy="210" r="5" fill="#e3262d"/><circle cx="354" cy="104" r="5" fill="#1f5bff"/><circle cx="386" cy="104" r="5" fill="#1f5bff"/>`
-        + ring(102, 210) + ring(228, 104) + txt(126, 232, "매수!", 19, "#e3262d", "start") + txt(244, 136, "매도!", 19, "#1f5bff", "start")
-        + cap(160, 44, "무릎에서 사서", 32) + cap(200, 290, "어깨에서 팔기", 32)) },
+    { svg: () => { // the 무릎/어깨 pose: one leg kicked up, hands and head down; the chart runs down the body from knee to shoulder
+        const limb = (d, w = 19) => `<path d="${d}" stroke="#333" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`, fill = (d, w = 13) => `<path d="${d}" stroke="#c8c8c4" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`;
+        const parts = ["M62 50L120 92L160 130", "M160 130L148 190L124 252", "M246 188L264 226L290 252", "M240 186L236 226L246 252"], torso = "M158 130L248 190";
+        const arrow = (x1, y1, x2, y2) => { const a = Math.atan2(y2 - y1, x2 - x1), h = 11; return `<path d="M${x1} ${y1}L${x2} ${y2}M${x2 - h * Math.cos(a - .5)} ${y2 - h * Math.sin(a - .5)}L${x2} ${y2}L${x2 - h * Math.cos(a + .5)} ${y2 - h * Math.sin(a + .5)}" stroke="#e3262d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`; };
+        return svg(parts.map(d => limb(d)).join("") + limb(torso, 30) + `<circle cx="272" cy="200" r="15" fill="#c8c8c4" stroke="#333" stroke-width="3"/>` + parts.map(d => fill(d)).join("") + fill(torso, 24)
+          + jag([[14, 80], [40, 70], [70, 84], [98, 78], [120, 92]], 9, 19) + jag([[120, 92], [160, 128], [205, 160], [250, 190]], 5, 23)
+          + jag([[250, 190], [270, 176], [295, 160], [320, 150], [345, 160], [368, 146], [390, 166]], 9, 29)
+          + `<polyline points="120,92 160,128 205,160 250,190" fill="none" stroke="#ff8a8a" stroke-width="2.5"/>`
+          + arrow(196, 60, 132, 88) + arrow(214, 262, 238, 206)
+          + cap(278, 48, "무릎에서 사서", 32) + cap(200, 290, "어깨에서 팔기", 32));
+      } },
     { svg: () => svg(jag([[15, 205], [60, 170], [110, 98], [150, 165], [205, 215], [250, 238], [300, 170], [350, 105], [388, 70]], 8, 3)
         + ring(110, 98) + ring(250, 238) + txt(132, 104, "← 내가 삼", 20, "#e3262d", "start") + txt(228, 245, "내가 팜 →", 20, "#1f5bff", "end") + txt(352, 140, "다음 날", 18, "#555")
         + cap(200, 52, "내가 사면 고점") + cap(200, 288, "내가 팔면 저점")) },
