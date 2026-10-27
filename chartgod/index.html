@@ -64,6 +64,8 @@ button:disabled { opacity: .45; cursor: default; }
 .hshow small { display: block; font-size: 12px; }
 .hshow b { font-size: 22px; }
 .hshow .clue { letter-spacing: .15em; }
+.hshow b.ct { display: block; font-size: 17px !important; line-height: 1.45; letter-spacing: 0 !important; font-family: "IBM Plex Sans KR", "Jua", sans-serif !important; font-weight: 700; }
+.hshow b.ct b { color: var(--tag); }
 .tps summary { font-weight: 700; cursor: pointer; }
 .tps div { font-size: 14px; padding: 2px 0; }
 .chartwrap { position: relative; }
@@ -172,11 +174,11 @@ body[data-theme=play] { --ink: #15193a; --sun: #ffd23f; --coral: #ff6047; --mint
 [data-theme=play] .esc-top small, [data-theme=play] .sold small, [data-theme=play] .hud .sc small, [data-theme=play] .slot small { color: var(--muted); }
 
 /* trade */
-body[data-theme=trade] { --bg: #04060a; --panel: #0a0e15; --line: #1d2633; --text: #d6deea; --muted: #6f7d92; --amber: #ffb000; --green: #19e3a1;
-  --up: #ff3b3b; --down: #3d8bff; --grid: rgba(120,150,190,.1); --axis: #6f7d92; --shade: rgba(255,176,0,.07); --split: #ffb000; --cline: #d6deea; --past: rgba(110,125,150,.45); --tag: #ffb000; --ctagtext: #000; --halo: #000; --gold: #ffb000; --goldtext: #000;
+body[data-theme=trade] { --bg: #000; --panel: rgba(6,12,9,.92); --line: #17331f; --text: #d6deea; --muted: #6f7d92; --amber: #39ff6e; --green: #19e3a1;
+  --up: #ff3b3b; --down: #3d8bff; --grid: rgba(120,150,190,.1); --axis: #6f7d92; --shade: rgba(57,255,110,.07); --split: #39ff6e; --cline: #d6deea; --past: rgba(110,125,150,.45); --tag: #39ff6e; --ctagtext: #000; --halo: #000; --gold: #ffb000; --goldtext: #000;
   --t1: #ffa31a; --t2: #19e3a1; --t3: #b48cff; --t4: #ff5fb0;
   --cfont: 500 11px "IBM Plex Mono", monospace;
-  font-family: "IBM Plex Sans KR", sans-serif; color: var(--text); background: var(--bg); background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0 1px, transparent 1px 3px); }
+  font-family: "IBM Plex Sans KR", sans-serif; color: var(--text); background: var(--bg); background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0 1px, transparent 1px 3px), url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22120%22%20height%3D%22120%22%3E%3Cg%20font-family%3D%22monospace%22%20font-size%3D%2218%22%20font-weight%3D%22700%22%20fill%3D%22%2339ff6e%22%3E%3Ctext%20x%3D%228%22%20y%3D%2222%22%20opacity%3D%22.16%22%3E%24%3C/text%3E%3Ctext%20x%3D%2252%22%20y%3D%2258%22%20opacity%3D%22.09%22%3E0%3C/text%3E%3Ctext%20x%3D%2288%22%20y%3D%2230%22%20opacity%3D%22.12%22%3E%24%3C/text%3E%3Ctext%20x%3D%2226%22%20y%3D%2296%22%20opacity%3D%22.1%22%3E7%3C/text%3E%3Ctext%20x%3D%2280%22%20y%3D%22104%22%20opacity%3D%22.15%22%3E%24%3C/text%3E%3C/g%3E%3C/svg%3E"); background-attachment: fixed; }
 [data-theme=trade] .card, [data-theme=trade] .hud, [data-theme=trade] .chartwrap, [data-theme=trade] .esc-top > div, [data-theme=trade] .sold, [data-theme=trade] .sheet, [data-theme=trade] .note, [data-theme=trade] .hshow, [data-theme=trade] .view-adv {
   background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
 [data-theme=trade] .view-adv { padding: 4px 12px; }
@@ -184,9 +186,9 @@ body[data-theme=trade] { --bg: #04060a; --panel: #0a0e15; --line: #1d2633; --tex
 [data-theme=trade] .card h1, [data-theme=trade] .card h2 { color: #fff; }
 [data-theme=trade] .hud .no, [data-theme=trade] .slot .no { background: transparent; border: 1px solid var(--tc); color: var(--tc); font-family: "VT323", monospace; font-size: 24px; font-weight: 400; border-radius: 4px; }
 [data-theme=trade] .hud .rd, [data-theme=trade] .hud .sc small, [data-theme=trade] .esc-top small, [data-theme=trade] .sold small, [data-theme=trade] .save, [data-theme=trade] .sub, [data-theme=trade] .foot, [data-theme=trade] .slot small, [data-theme=trade] .hshow small, [data-theme=trade] .maxp { color: var(--muted); font-family: "IBM Plex Mono", "IBM Plex Sans KR", monospace; }
-[data-theme=trade] .hud .sc b { font-family: "VT323", monospace; font-weight: 400; font-size: 34px; color: var(--amber); text-shadow: 0 0 10px rgba(255,176,0,.5); }
+[data-theme=trade] .hud .sc b { font-family: "VT323", monospace; font-weight: 400; font-size: 34px; color: var(--amber); text-shadow: 0 0 10px rgba(57,255,110,.5); }
 [data-theme=trade] .gbar .gt { color: var(--amber); font-size: 18px; }
-[data-theme=trade] .gbar .clock { font-family: "VT323", monospace; font-size: 44px; color: var(--amber); text-shadow: 0 0 12px rgba(255,176,0,.55); line-height: .9; }
+[data-theme=trade] .gbar .clock { font-family: "VT323", monospace; font-size: 44px; color: var(--amber); text-shadow: 0 0 12px rgba(57,255,110,.55); line-height: .9; }
 [data-theme=trade] .gbar .clock.hot { color: var(--up); text-shadow: 0 0 12px rgba(255,59,59,.6); }
 [data-theme=trade] .tline { background: #111823; } [data-theme=trade] .tline i { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
 [data-theme=trade] .btn, [data-theme=trade] .slot, [data-theme=trade] .hbtn, [data-theme=trade] .mini, [data-theme=trade] .opt, [data-theme=trade] .seg button { background: #0e141d; border: 1px solid #2a3647; border-radius: 5px; color: var(--text); }
@@ -195,7 +197,7 @@ body[data-theme=trade] { --bg: #04060a; --panel: #0a0e15; --line: #1d2633; --tex
 [data-theme=trade] .seg button:first-child { border-radius: 5px 0 0 5px; } [data-theme=trade] .seg button:last-child { border-radius: 0 5px 5px 0; border-left: 0; }
 [data-theme=trade] .seg button.on { background: var(--amber); color: #000; border-color: var(--amber); }
 [data-theme=trade] .row input, [data-theme=trade] .answer input, [data-theme=trade] .lbl input { background: #000; color: var(--text); border: 1px solid #2a3647; border-radius: 5px; font-family: "IBM Plex Mono", "IBM Plex Sans KR", monospace; }
-[data-theme=trade] .opt.on { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber), 0 0 20px rgba(255,176,0,.25); }
+[data-theme=trade] .opt.on { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber), 0 0 20px rgba(57,255,110,.25); }
 [data-theme=trade] .opt b { font-family: "VT323", monospace; font-weight: 400; font-size: 36px; color: var(--amber); border-right: 1px solid var(--line); }
 [data-theme=trade] .opt canvas { background: #070a10; }
 [data-theme=trade] .esc-top b, [data-theme=trade] .sold b { font-family: "VT323", monospace; font-weight: 400; font-size: 40px; line-height: .9; }
@@ -371,7 +373,7 @@ function drawChart(cv, o) {
   // grid + price axis
   const steps = niceSteps(lo, hi, Math.max(3, Math.round(H / 60)));
   ctx.lineWidth = 1; ctx.textAlign = "left";
-  steps.forEach(p => { const y = Y(p); ctx.strokeStyle = C.grid; ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + W, y); ctx.stroke(); ctx.fillStyle = C.axis; ctx.fillText(fmtAxis(p, o.cur), padL + W + 8, y); });
+  steps.forEach(p => { const y = Y(p); ctx.strokeStyle = C.grid; ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + W, y); ctx.stroke(); if (o.noY) return; ctx.fillStyle = C.axis; ctx.fillText(fmtAxis(p, o.cur), padL + W + 8, y); });
   // date axis
   if (o.dates) {
     const every = Math.max(1, Math.ceil((x1 - x0) / Math.max(2, W / (o.dateGap || 74))));
@@ -579,13 +581,14 @@ function waitingHTML() {
 }
 function lockedNote() { return st.status === "locked" ? `<div class="note">⏰ 마감! 정답 공개를 기다려요</div>` : ""; }
 function hintBox() {
-  const h = priv.hint || { kinds: [], left: 10 }, mine = priv.mine || {}, can = live() && !mine.sub;
-  const k1 = st.game === "draw" ? "종목명" : "초성";
+  const h = priv.hint || { kinds: [], left: 10, opts: [] }, mine = priv.mine || {}, can = live() && !mine.sub, q = st.q;
   const show = [];
   if (h.name) show.push(`<div class="hshow"><small>종목 힌트</small><b>${esc(h.name)}</b> <span>${esc(h.symbol)}</span></div>`);
-  if (h.clue) show.push(`<div class="hshow"><small>초성 힌트</small><b class="clue">${esc(h.clue)}</b></div>`);
+  (h.clues || []).forEach(c => show.push(`<div class="hshow"><small>${c.icon} ${esc(c.title)}</small><b class="${c.type === "lead" ? "clue" : "ct"}">${c.text}</b></div>`));
+  if (h.price && q) { const v = q.c.flatMap(c => [c[1], c[2]]); show.push(`<div class="hshow"><small>💰 가격대 힌트</small><b>${fmtPx(Math.min(...v), q.cur)} ~ ${fmtPx(Math.max(...v), q.cur)}</b> <span>공개 구간 기준 · 차트에 눈금 표시</span></div>`); }
   if (h.tps) show.push(`<details class="hshow tps"><summary>전환점 ${h.tps.length ? h.tps.length + "곳 (차트에 표시)" : "없음"}</summary>${h.tps.map(p => `<div>${p.k === "high" ? "▲ 고점" : "▼ 저점"} ${mmdd(p.d)} · ${fmtPx(p.p, st.q.cur)}</div>`).join("") || "<div>적합한 전환점이 없어요</div>"}</details>`);
-  return `<div class="hints"><div class="hrow"><button type="button" class="hbtn" data-h="identity" ${h.kinds.includes("identity") || !can ? "disabled" : ""}>💡 ${k1} 힌트${h.kinds.includes("identity") ? " ✓" : ""}</button><button type="button" class="hbtn" data-h="turning" ${h.kinds.includes("turning") || !can ? "disabled" : ""}>📍 전환점 힌트${h.kinds.includes("turning") ? " ✓" : ""}</button><span class="maxp">최대 <b>${fmtPts(h.left)}</b>점</span></div>${show.join("")}</div>`;
+  const btns = (h.opts || []).map(o => { const used = h.kinds.includes(o.k); return `<button type="button" class="hbtn" data-h="${o.k}" ${used || !can ? "disabled" : ""}>${o.label}${used ? " ✓" : ""}</button>`; }).join("");
+  return `<div class="hints"><div class="hrow">${btns}<span class="maxp">최대 <b>${fmtPts(h.left)}</b>점</span></div>${show.join("")}</div>`;
 }
 function drawHTML() {
   const mine = priv.mine || {}, done = mine.sub || !live();
@@ -593,14 +596,13 @@ function drawHTML() {
     <div class="chartwrap"><canvas id="cv" style="height:${L.view.h}px"></canvas><div class="cv-tip" id="cvTip">${done ? (mine.sub ? "✔ 제출 완료" : "") : "오른쪽 빈칸에 이어 그리세요"}</div></div>
     <div class="tools">
       <div class="seg"><button type="button" data-mode="draw" class="${L.mode === "draw" ? "on" : ""}">✏️ 그리기</button><button type="button" data-mode="pan" class="${L.mode === "pan" ? "on" : ""}">✋ 이동</button></div>
-      <button type="button" class="mini" id="vZone">🔍 ${L.view.xz > 1 ? "전체 보기" : "구간 확대"}</button>
+      <button type="button" class="mini" id="vAll">전체</button><button type="button" class="mini" id="vZone">그리기 구간</button><button type="button" class="mini" id="vReset">초기화</button>
     </div>
     <details class="view-adv"><summary>보기 조절</summary>
       <label>가로 확대 <input type="range" id="vx" min="1" max="4" step="0.1" value="${L.view.xz}"></label>
       <label>가격 범위 <input type="range" id="vy" min="0.5" max="2.5" step="0.05" value="${L.view.yz}"></label>
       <label>가격 위치 <input type="range" id="vs" min="-0.8" max="0.8" step="0.02" value="${L.view.ys}"></label>
       <label>차트 높이 <input type="range" id="vh" min="220" max="520" step="10" value="${L.view.h}"></label>
-      <button type="button" class="mini" id="vReset">보기 초기화</button>
     </details>
     <div class="acts"><button type="button" class="btn ghost" id="clear" ${done ? "disabled" : ""}>다시 그리기</button><button type="button" class="btn go" id="submit" ${done ? "disabled" : ""}>${mine.sub ? "제출 완료" : "제출하기"}</button></div>
     <p class="save" id="saveSt"></p>`;
@@ -614,7 +616,7 @@ function guessHTML() {
 }
 function spotHTML() {
   const mine = priv.mine || {}, done = mine.sub || !live(), sel = mine.sub ? mine.choice : L.choice;
-  return `${lockedNote()}<p class="lead">${st.q && st.q.split ? "앞부분은 모두 같아요. 이어지는 진짜 차트는?" : ""}</p>
+  return `${lockedNote()}${hintBox()}<p class="lead">${st.q && st.q.split ? "앞부분은 모두 같아요. 이어지는 진짜 차트는?" : ""}</p>
     <div class="opts">${st.q.opts.map(o => `<button type="button" class="opt ${sel === o.id ? "on" : ""}" data-o="${o.id}" ${done ? "disabled" : ""}><b>${o.id}</b><canvas data-o="${o.id}"></canvas></button>`).join("")}</div>
     <div class="acts"><button type="button" class="btn go wide" id="confirm" ${done || !sel ? "disabled" : ""}>${mine.sub ? `${mine.choice} 확정 완료` : sel ? `${sel}로 확정하기` : "차트를 하나 고르세요"}</button></div>`;
 }
@@ -623,7 +625,7 @@ function escapeHTML() {
   return `${lockedNote()}<div class="esc-top"><div><small>현재가</small><b id="ePx">-</b></div><div><small>시작가 대비</small><b id="eRet">-</b></div></div>
     <div class="chartwrap"><canvas id="cv" style="height:260px"></canvas></div>
     ${sold ? `<div class="sold"><small>매도 완료</small><b>${fmtPx(sold.price, st.q.cur)}</b><span class="${sold.ret >= 0 ? "up" : "dn"}">${sold.ret >= 0 ? "+" : ""}${sold.ret.toFixed(2)}%</span><p>순위는 정답 공개 때 발표돼요</p></div>`
-      : `<button type="button" class="sell" id="sell" ${live() ? "" : "disabled"}>지금 매도!</button><p class="sub">한 번만 누를 수 있어요</p>`}`;
+      : `<button type="button" class="sell" id="sell" ${live() ? "" : "disabled"}>지금 매도!</button><p class="sub">한 번만 누를 수 있어요 · 서버가 접수한 순간의 가격으로 순위를 정해요</p>`}`;
 }
 function revealHTML() {
   const rv = st.rv, t = me(), o = rv.teams[t.slot], g = st.game;
@@ -641,7 +643,7 @@ function renderWin(v) {
   const names = st.win.slots.map(sl => st.teams[sl - 1].name), mine = priv && st.win.slots.includes(priv.slot);
   v.innerHTML = `<div class="card center win"><div class="trophy">🏆</div><small>${names.length > 1 ? "공동 우승" : "최종 우승"}</small><h1>${names.map(esc).join(" · ")}</h1>${mine ? "<p class='yay'>우리 조가 차트의 신!</p>" : ""}
     <div class="wl">${st.teams.slice().sort((a, b) => b.total - a.total).map(t => `<div style="--tc:var(--t${t.slot})"><span>${esc(t.name)}</span><b>${fmtPts(t.total)}</b></div>`).join("")}</div></div>
-    <div class="rain">${Array.from({ length: 18 }, () => `<i style="left:${Math.random() * 100}%;--d:${3 + Math.random() * 3}s;--dl:${-Math.random() * 5}s">💵</i>`).join("")}</div>`;
+    <div class="rain">${Array.from({ length: 46 }, () => `<i style="left:${Math.random() * 100}%;--d:${2.2 + Math.random() * 2.8}s;--dl:${-Math.random() * 5}s;font-size:${26 + Math.random() * 30}px">💵</i>`).join("")}</div>`;
 }
 
 /* ---------- interactions ---------- */
@@ -663,10 +665,8 @@ function wire() {
   if (window.ResizeObserver && cv && !cv._ro) { cv._ro = new ResizeObserver(() => softRender()); cv._ro.observe(cv); }
 }
 function askHint(kind) {
-  const h = priv.hint, after = fmtPts(h.left * (st.hintPct / 100));
-  const what = kind === "identity" ? (st.game === "draw" ? "종목명 힌트" : "초성 힌트") : "전환점 힌트";
-  const desc = kind === "identity" ? (st.game === "draw" ? "이 휴대폰에만 종목명과 코드가 보여요." : "종목명의 초성(영어는 첫 글자)을 알려 줘요.") : (st.game === "draw" ? "숨겨진 구간의 고점·저점 위치를 차트에 표시해요." : "차트의 큰 고점·저점을 표시해요.");
-  confirmSheet(`${what}를 쓸까요?`, `${desc}<br>이번 라운드 최대 점수 <b>${fmtPts(h.left)}점 → ${after}점</b>`, "힌트 쓰기", () => send({ type: "hint", round: st.round, kind }));
+  const h = priv.hint, o = (h.opts || []).find(x => x.k === kind); if (!o) return;
+  confirmSheet(`${o.label.replace(/^\S+\s/, "")}를 쓸까요?`, `${o.desc}<br>이번 라운드 최대 점수 <b>${fmtPts(h.left)}점 → ${fmtPts(h.next)}점</b>`, "힌트 쓰기", () => send({ type: "hint", round: st.round, kind }));
 }
 function confirmSheet(title, body, ok, fn) {
   const d = document.createElement("div"); d.className = "sheet-bg";
@@ -710,7 +710,8 @@ function wireDraw(cv) {
   const q = st.q;
   document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { L.mode = b.dataset.mode; document.querySelectorAll("[data-mode]").forEach(x => x.classList.toggle("on", x === b)); cv.style.touchAction = L.mode === "draw" ? "none" : "none"; });
   const V = L.view;
-  $("vZone").onclick = e => { if (V.xz > 1) { V.xz = 1; V.xc = null; } else { V.xz = 2.2; V.xc = q.split - 1 + (q.n - q.split) / 2; } e.currentTarget.textContent = "🔍 " + (V.xz > 1 ? "전체 보기" : "구간 확대"); syncSliders(); softRender(); };
+  $("vAll").onclick = () => { V.xz = 1; V.xc = null; syncSliders(); softRender(); };
+  $("vZone").onclick = () => { V.xz = 2.2; V.xc = q.split - 1 + (q.n - q.split) / 2; syncSliders(); softRender(); };
   $("vReset").onclick = () => { L.view = { xz: 1, xc: null, yz: 1, ys: 0, h: 320 }; L.base = null; render(); };
   $("vx").oninput = e => { V.xz = +e.target.value; softRender(); };
   $("vy").oninput = e => { V.yz = +e.target.value; softRender(); };
@@ -783,7 +784,8 @@ function paint() {
   if (st.game === "spot") {
     const ranges = q.opts.flatMap(x => x.c.flatMap(c => [c[1], c[2]])).concat(q.c.flatMap(c => [c[1], c[2]]));
     document.querySelectorAll(".opt canvas").forEach(c => { const o = q.opts.find(x => x.id === c.dataset.o);
-      drawChart(c, { n: q.n, candles: [...q.c, ...o.c].map(x => ({ o: x[0], h: x[1], l: x[2], c: x[3] })), split: q.split, cur: q.cur, font, padR: 46, padL: 4, padB: 6, padT: 6, lo: Math.min(...ranges) * .97, hi: Math.max(...ranges) * 1.03 }); });
+      const pr = !!(priv.hint && priv.hint.price);
+      drawChart(c, { n: q.n, candles: [...q.c, ...o.c].map(x => ({ o: x[0], h: x[1], l: x[2], c: x[3] })), split: q.split, cur: q.cur, font, padR: pr ? 46 : 8, noY: !pr, padL: 4, padB: 20, padT: 6, dates: q.dates, dateGap: 52, lo: Math.min(...ranges) * .97, hi: Math.max(...ranges) * 1.03 }); });
   }
   if (st.game === "escape" && cv) paintEscape(cv, q, font);
 }
@@ -818,12 +820,13 @@ function paintReveal(cv) {
   if (g === "escape") {
     const o = rv.teams[sl], marks = [{ x: rv.peak.i, p: rv.peak.p, color: cssVar("--gold"), textColor: cssVar("--goldtext"), r: 6, label: "최고 " + fmtPx(rv.peak.p, rv.cur) }];
     if (o.sold) marks.push({ x: o.sold.pos, p: o.sold.price, color: cssVar(`--t${sl}`), r: 7, label: "내 매도", below: true });
-    drawChart(cv, { n: rv.cl.length, dates: rv.dates, cur: rv.cur, font, padR: 56, padL: 4, line: rv.cl.map((c, k) => [k, c]), lineColor: cssVar("--cline"), lineW: 2, marks, dateGap: 60 });
+    drawChart(cv, { n: rv.cl.length, dates: rv.dates, cur: rv.cur, font, padR: 56, padL: 4, candles: (rv.dk || []).map(c => ({ o: c[0], h: c[1], l: c[2], c: c[3] })), lines: [{ pts: rv.cl.map((c, k) => [k, c]), color: cssVar("--cline"), w: 1.6, alpha: .75 }], marks, dateGap: 60 });
     return;
   }
   const cand = rv.full.map((c, i) => ({ o: c[0], h: c[1], l: c[2], c: c[3], dim: g === "draw" && i < q.split }));
   const C = { n: q.n, dates: q.dates, cur: q.cur, font, padR: 52, padL: 4, candles: cand, dateGap: 56 };
   if (g === "draw" || g === "spot") C.split = q.split;
+  if (g === "spot") C.lines = [{ pts: rv.full.map((c, i) => [i, c[3]]).slice(q.split - 1), color: cssVar("--cline"), w: 1.8, alpha: .8 }];
   if (g === "draw" && rv.teams[sl].pred) C.lines = [{ pts: [[q.split - 1, rv.full[q.split - 1][3]], ...predToXY(rv.teams[sl].pred, q.split, q.n)], color: cssVar(`--t${sl}`), w: 3.5, halo: cssVar("--halo") }];
   drawChart(cv, C);
 }
